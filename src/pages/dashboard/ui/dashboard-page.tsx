@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { dashboardQueries } from '@/entities/dashboard';
 import { Card, Spinner } from '@/shared/ui';
-import { dashboardQueries } from '../api/dashboard.queries';
 
 const METRIC_LABEL = {
   numOfTask: '일',

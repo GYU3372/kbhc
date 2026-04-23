@@ -1,16 +1,22 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
+import { Link, useElementScrollRestoration } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { CheckCircledIcon, CircleIcon } from '@radix-ui/react-icons';
-import { useCallback, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { taskQueries } from '@/entities/task';
 import type { TaskItem } from '@/entities/task';
 import { Card, EmptyState, Spinner } from '@/shared/ui';
 
-const ROW_ESTIMATE = 96;
+const ROW_ESTIMATE = 116;
+export const TASK_LIST_SCROLL_RESTORATION_ID = 'task-list';
 
-export function TaskList() {
-  const parentRef = useRef<HTMLDivElement | null>(null);
+type TaskListProps = {
+  scrollElement: HTMLElement | null;
+};
+
+export function TaskList({ scrollElement }: TaskListProps) {
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const [scrollMargin, setScrollMargin] = useState(0);
 
   const {
     data,
@@ -24,11 +30,42 @@ export function TaskList() {
   const items: TaskItem[] = data?.pages.flatMap((page) => page.data) ?? [];
   const canLoadMore = hasNextPage ?? false;
 
+  const scrollEntry = useElementScrollRestoration({
+    id: TASK_LIST_SCROLL_RESTORATION_ID,
+  });
+
+  useLayoutEffect(() => {
+    const listElement = listRef.current;
+    if (!scrollElement || !listElement) return;
+
+    const updateScrollMargin = () => {
+      const scrollTop = scrollElement.getBoundingClientRect().top;
+      const listTop = listElement.getBoundingClientRect().top;
+      setScrollMargin(Math.max(0, listTop - scrollTop + scrollElement.scrollTop));
+    };
+
+    updateScrollMargin();
+
+    const observer = new ResizeObserver(updateScrollMargin);
+    observer.observe(scrollElement);
+    observer.observe(listElement);
+    window.addEventListener('resize', updateScrollMargin);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateScrollMargin);
+    };
+  }, [items.length, scrollElement]);
+
   const virtualizer = useVirtualizer({
     count: items.length + (canLoadMore ? 1 : 0),
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => scrollElement,
+    getItemKey: (index) => items[index]?.id ?? `loader-${index}`,
     estimateSize: () => ROW_ESTIMATE,
+    enabled: scrollElement !== null,
+    initialOffset: () => scrollEntry?.scrollY ?? 0,
     overscan: 6,
+    scrollMargin,
   });
 
   const sentinelRef = useCallback(
@@ -40,12 +77,12 @@ export function TaskList() {
             void fetchNextPage();
           }
         },
-        { root: parentRef.current, rootMargin: '200px' },
+        { root: scrollElement, rootMargin: '200px' },
       );
       observer.observe(node);
       return () => observer.disconnect();
     },
-    [canLoadMore, isFetchingNextPage, fetchNextPage],
+    [canLoadMore, isFetchingNextPage, fetchNextPage, scrollElement],
   );
 
   if (isLoading) {
@@ -72,12 +109,12 @@ export function TaskList() {
 
   return (
     <div
-      ref={parentRef}
-      className="flex-1 overflow-y-auto"
-      style={{ maxHeight: 'calc(100dvh - 10rem)' }}
+      ref={listRef}
+      className="relative w-full"
+      style={{ height: `${virtualizer.getTotalSize()}px` }}
     >
       <div
-        className="relative w-full"
+        className="absolute inset-x-0 top-0"
         style={{ height: `${virtualizer.getTotalSize()}px` }}
       >
         {virtualItems.map((virtualRow) => {
@@ -87,14 +124,16 @@ export function TaskList() {
             <div
               key={virtualRow.key}
               data-index={virtualRow.index}
-              ref={virtualizer.measureElement}
-              className="absolute left-0 top-0 w-full px-1 py-1.5"
-              style={{ transform: `translateY(${virtualRow.start}px)` }}
+              className="absolute left-0 top-0 box-border w-full px-1 py-1.5"
+              style={{
+                height: `${virtualRow.size}px`,
+                transform: `translateY(${virtualRow.start - scrollMargin}px)`,
+              }}
             >
               {isSentinel ? (
                 <div
                   ref={sentinelRef}
-                  className="flex items-center justify-center py-3 text-sm text-text-secondary"
+                  className="flex h-full items-center justify-center text-sm text-text-secondary"
                 >
                   {isFetchingNextPage ? '불러오는 중…' : ' '}
                 </div>
@@ -102,9 +141,9 @@ export function TaskList() {
                 <Link
                   to="/task/$id"
                   params={{ id: task.id }}
-                  className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="block h-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
-                  <Card interactive>
+                  <Card interactive className="h-full overflow-hidden">
                     <div className="flex items-start gap-3">
                       <span className="mt-0.5 shrink-0" aria-hidden>
                         {task.status === 'DONE' ? (

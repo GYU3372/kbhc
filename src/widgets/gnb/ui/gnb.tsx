@@ -17,7 +17,7 @@ export function Gnb() {
     <header className="border-b border-disabled bg-surface">
       <nav
         aria-label="사용자 내비게이션"
-        className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3"
+        className="flex w-full items-center gap-2 px-5 py-3 md:px-8"
       >
         <Link
           to="/"

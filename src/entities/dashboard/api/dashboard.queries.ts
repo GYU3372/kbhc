@@ -1,10 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { http } from '@/shared/api/http';
-import type { components } from '@/shared/api/openapi';
-
-type DashboardResponse = components['schemas']['DashboardResponse'];
-
-const getDashboard = () => http.get<DashboardResponse>('/api/dashboard');
+import { getDashboard } from './get-dashboard';
 
 export const dashboardQueries = {
   all: () => ['dashboard'] as const,

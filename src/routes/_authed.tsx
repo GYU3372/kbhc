@@ -44,9 +44,9 @@ function AuthedLayout() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1">
+    <div className="flex min-h-0 w-full flex-1">
       <Lnb />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <Outlet />
       </div>
     </div>

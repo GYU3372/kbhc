@@ -1,10 +1,19 @@
-import { TaskList } from '@/widgets/task-list';
+import { useState } from 'react';
+import { TaskList, TASK_LIST_SCROLL_RESTORATION_ID } from '@/widgets/task-list';
 
 export function TaskListPage() {
+  const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
+
   return (
-    <main className="flex min-h-0 flex-1 flex-col gap-4 p-4">
-      <h1 className="text-xl font-semibold text-text-primary">할 일</h1>
-      <TaskList />
+    <main
+      ref={setScrollElement}
+      data-scroll-restoration-id={TASK_LIST_SCROLL_RESTORATION_ID}
+      className="min-h-0 flex-1 overflow-y-auto px-5 py-5 md:px-8"
+    >
+      <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-4">
+        <h1 className="text-xl font-semibold text-text-primary">할 일</h1>
+        <TaskList scrollElement={scrollElement} />
+      </div>
     </main>
   );
 }

@@ -19,16 +19,16 @@ export function Lnb() {
   return (
     <aside
       aria-label="기능 내비게이션"
-      className="shrink-0 border-r border-disabled bg-surface py-4"
+      className="w-16 shrink-0 border-r border-disabled bg-surface py-4 md:w-52"
     >
-      <ul className="flex flex-col gap-1 px-2">
+      <ul className="flex flex-col gap-1 px-2 md:px-3">
         {items.map(({ to, label, Icon, exact }) => (
           <li key={to}>
             <Link
               to={to}
               activeOptions={{ exact: exact ?? false }}
               className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-md md:w-auto md:justify-start md:gap-2 md:px-3',
+                'flex h-10 w-full items-center justify-center rounded-md md:justify-start md:gap-2 md:px-3',
                 'text-text-secondary transition-colors',
                 'hover:bg-disabled hover:text-text-primary',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
