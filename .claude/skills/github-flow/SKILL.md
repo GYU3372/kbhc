@@ -14,6 +14,7 @@ description: 새 Phase/feature 작업 시작·진행·종료 시 GitHub Flow + C
 3. 커밋 메시지: [Conventional Commits](https://www.conventionalcommits.org/) — `feat / fix / chore / docs / refactor / style / build / ci / test`
 4. 머지는 `git merge --no-ff`로 Phase 단위 이력 보존
 5. `--no-verify`로 hook 우회 금지, `main`에 force push 금지
+6. **`main` 머지는 사용자의 명시적 승인 이후에만 실행**. 타입체크·린트·빌드 통과만으로 머지하지 않는다. 사용자가 직접 `pnpm dev`로 UI/기능을 확인한 뒤 "머지해" 같은 명시적 승인이 있을 때만 `git checkout main` → `merge --no-ff`를 실행한다.
 
 ## 1. 새 Phase/feature 시작
 
@@ -40,20 +41,24 @@ git checkout -b <type>/<NN>-<slug>
 
 ## 3. Phase 종료 및 `main` 머지
 
+> ⚠️ **머지 전 사용자 승인 필수.** 자동 검증(typecheck/lint/build)·리뷰 에이전트 통과는 충분 조건이 아니다. 브라우저 수동 검증은 사용자가 수행하며, "머지해" 같은 명시적 승인이 있을 때만 4단계 이후를 실행한다. 자동화 환경이라 브라우저 확인이 불가하면 그 사실을 먼저 보고하고 대기한다.
+
 ```bash
-# 1) 작업 브랜치에서 최종 검증
+# 1) 작업 브랜치에서 자동 검증
 pnpm typecheck
 pnpm lint
 pnpm build
 
 # 2) prompts/NN-*.md 하단에 "## 실행 결과 (YYYY-MM-DD)" 섹션 추가하고 커밋
 
-# 3) main으로 머지
+# 3) 사용자에게 브랜치 상태·검증 결과를 보고하고 머지 승인을 요청. 승인 대기.
+
+# 4) 승인 후에만 main으로 머지
 git checkout main
 git merge --no-ff <branch> -m "<type>: phase <NN> <summary>"
 #   예: git merge --no-ff feat/02-auth -m "feat: phase 02 auth flow"
 
-# 4) 로컬 브랜치 정리
+# 5) 로컬 브랜치 정리 (선택 — 사용자 확인 후)
 git branch -d <branch>
 ```
 
