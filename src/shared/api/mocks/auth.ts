@@ -1,4 +1,5 @@
 import { ACCESS_TTL_MS, REFRESH_TTL_MS } from './constants';
+import { recallRefreshToken } from './cookie-jar';
 
 type JwtPayload = { id: string; exp: number };
 
@@ -63,8 +64,7 @@ export const verifyAccess = (request: Request): VerifyResult => {
 export const verifyRefresh = (request: Request): VerifyResult => {
   const cookie = request.headers.get('Cookie') ?? '';
   const match = /(?:^|;\s*)token=([^;]+)/.exec(cookie);
-  if (!match) return { ok: false };
-  const tokenValue = match[1];
+  const tokenValue = match?.[1] ?? recallRefreshToken();
   if (!tokenValue) return { ok: false };
   const payload = parseJwt(tokenValue);
   if (!isLive(payload)) return { ok: false };

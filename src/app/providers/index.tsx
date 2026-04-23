@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { AppErrorBoundary } from './error-boundary';
 import { QueryProvider } from './query-provider';
+import { SessionProvider } from './session-provider';
 
 type ProvidersProps = {
   children: ReactNode;
@@ -9,7 +10,9 @@ type ProvidersProps = {
 export function Providers({ children }: ProvidersProps) {
   return (
     <AppErrorBoundary>
-      <QueryProvider>{children}</QueryProvider>
+      <QueryProvider>
+        <SessionProvider>{children}</SessionProvider>
+      </QueryProvider>
     </AppErrorBoundary>
   );
 }

@@ -7,9 +7,9 @@ import { Label } from './label';
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
   label: string;
-  error?: string;
-  hint?: string;
-  id?: string;
+  error?: string | undefined;
+  hint?: string | undefined;
+  id?: string | undefined;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
