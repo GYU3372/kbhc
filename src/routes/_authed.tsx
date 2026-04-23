@@ -1,10 +1,54 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router';
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  useNavigate,
+  useRouterState,
+} from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { useSessionStore } from '@/entities/session';
+import { Lnb } from '@/widgets/lnb';
+import { Spinner } from '@/shared/ui';
 
 export const Route = createFileRoute('/_authed')({
-  // TODO(Phase 02+): beforeLoad에서 session 스토어 확인 후 비로그인이면 /sign-in 리다이렉트
+  beforeLoad: ({ location }) => {
+    const { status, isAuthenticated } = useSessionStore.getState();
+    // 부트 중에는 판단을 보류하고 컴포넌트에서 리다이렉트 처리.
+    if (status !== 'ready') return;
+    if (!isAuthenticated) {
+      throw redirect({ to: '/sign-in', search: { redirect: location.href } });
+    }
+  },
   component: AuthedLayout,
 });
 
 function AuthedLayout() {
-  return <Outlet />;
+  const status = useSessionStore((state) => state.status);
+  const isAuthenticated = useSessionStore((state) => state.isAuthenticated);
+  const isRouterLoading = useRouterState({ select: (s) => s.isLoading });
+  const navigate = useNavigate();
+  const href = useRouterState({ select: (s) => s.location.href });
+
+  useEffect(() => {
+    if (status === 'ready' && !isAuthenticated) {
+      void navigate({ to: '/sign-in', search: { redirect: href } });
+    }
+  }, [status, isAuthenticated, href, navigate]);
+
+  if (status !== 'ready' || isRouterLoading || !isAuthenticated) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <Spinner label="세션 확인 중" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-1">
+      <Lnb />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Outlet />
+      </div>
+    </div>
+  );
 }

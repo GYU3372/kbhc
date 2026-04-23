@@ -1,9 +1,17 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router';
+import { Gnb } from '@/widgets/gnb';
 
 export const Route = createRootRoute({
   component: RootLayout,
 });
 
 function RootLayout() {
-  return <Outlet />;
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <Gnb />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Outlet />
+      </div>
+    </div>
+  );
 }

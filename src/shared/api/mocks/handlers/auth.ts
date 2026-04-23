@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import type { components } from '@/shared/api/openapi';
 import { issueTokens, verifyRefresh } from '../auth';
 import { DEMO_ACCOUNTS, REFRESH_TTL_MS } from '../constants';
+import { rememberRefreshToken } from '../cookie-jar';
 
 type SignInRequest = components['schemas']['SignInRequest'];
 type AuthTokenResponse = components['schemas']['AuthTokenResponse'];
@@ -36,6 +37,7 @@ export const authHandlers = [
     }
 
     const tokens = issueTokens(account.id);
+    rememberRefreshToken(tokens.refreshToken);
     return HttpResponse.json(tokens, {
       headers: { 'Set-Cookie': setRefreshCookie(tokens.refreshToken) },
     });
@@ -50,6 +52,7 @@ export const authHandlers = [
       );
     }
     const tokens = issueTokens(verified.userId);
+    rememberRefreshToken(tokens.refreshToken);
     return HttpResponse.json(tokens, {
       headers: { 'Set-Cookie': setRefreshCookie(tokens.refreshToken) },
     });

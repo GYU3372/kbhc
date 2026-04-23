@@ -1,1 +1,1 @@
-export {};
+export { Gnb } from './ui/gnb';
