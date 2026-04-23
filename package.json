@@ -36,9 +36,9 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@faker-js/faker": "^9.3.0",
+    "@tailwindcss/vite": "^4.0.0",
     "@tanstack/eslint-plugin-query": "^5.62.9",
     "@tanstack/router-plugin": "^1.95.5",
-    "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
@@ -57,5 +57,10 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.19.1",
     "vite": "^6.0.7"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
