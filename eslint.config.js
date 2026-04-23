@@ -9,7 +9,13 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'src/routes/routeTree.gen.ts', 'src/shared/api/openapi.d.ts'],
+    ignores: [
+      'dist',
+      'node_modules',
+      'src/routes/routeTree.gen.ts',
+      'src/shared/api/openapi.d.ts',
+      'public/mockServiceWorker.js',
+    ],
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
