@@ -14,7 +14,7 @@ export function DashboardPage() {
   const { data, isLoading, isError } = useQuery(dashboardQueries.summary());
 
   return (
-    <main className="flex flex-col gap-4 p-4">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-4 p-4">
       <h1 className="text-xl font-semibold text-text-primary">대시보드</h1>
 
       {isLoading ? (

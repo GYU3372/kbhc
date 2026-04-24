@@ -40,7 +40,7 @@ export function TaskDetailPage({ id }: TaskDetailPageProps) {
 
   if (isLoading) {
     return (
-      <main className="flex flex-1 items-center justify-center p-4">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 items-center justify-center p-4">
         <Spinner label="상세 정보 불러오는 중" />
       </main>
     );
@@ -48,7 +48,7 @@ export function TaskDetailPage({ id }: TaskDetailPageProps) {
 
   if (isError && error instanceof HttpError && error.status === 404) {
     return (
-      <main className="flex flex-1 flex-col p-4">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-4">
         <EmptyState
           title="할 일을 찾을 수 없어요"
           description={`ID: ${id}`}
@@ -62,7 +62,7 @@ export function TaskDetailPage({ id }: TaskDetailPageProps) {
 
   if (isError || !data) {
     return (
-      <main className="p-4">
+      <main className="mx-auto w-full max-w-5xl p-4">
         <p role="alert" className="text-sm text-danger">
           상세 정보를 불러오지 못했습니다.
         </p>
@@ -71,7 +71,7 @@ export function TaskDetailPage({ id }: TaskDetailPageProps) {
   }
 
   return (
-    <main className="flex flex-col gap-4 p-4">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-4 p-4">
       <header className="flex flex-col gap-1">
         <p className="text-xs text-text-secondary">ID: {id}</p>
         <h1 className="text-xl font-semibold text-text-primary">{data.title}</h1>
