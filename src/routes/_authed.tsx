@@ -5,10 +5,14 @@ import {
   useNavigate,
   useRouterState,
 } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSessionStore } from '@/entities/session';
 import { Lnb } from '@/widgets/lnb';
 import { Spinner } from '@/shared/ui';
+
+function sanitizeRedirect(href: string): string | undefined {
+  return href.startsWith('/sign-in') ? undefined : href;
+}
 
 export const Route = createFileRoute('/_authed')({
   beforeLoad: ({ location }) => {
@@ -16,7 +20,11 @@ export const Route = createFileRoute('/_authed')({
     // 부트 중에는 판단을 보류하고 컴포넌트에서 리다이렉트 처리.
     if (status !== 'ready') return;
     if (!isAuthenticated) {
-      throw redirect({ to: '/sign-in', search: { redirect: location.href } });
+      const target = sanitizeRedirect(location.href);
+      throw redirect({
+        to: '/sign-in',
+        search: target ? { redirect: target } : {},
+      });
     }
   },
   component: AuthedLayout,
@@ -28,12 +36,21 @@ function AuthedLayout() {
   const isRouterLoading = useRouterState({ select: (s) => s.isLoading });
   const navigate = useNavigate();
   const href = useRouterState({ select: (s) => s.location.href });
+  const hrefRef = useRef(href);
+  hrefRef.current = href;
+  const didRedirectRef = useRef(false);
 
   useEffect(() => {
+    if (didRedirectRef.current) return;
     if (status === 'ready' && !isAuthenticated) {
-      void navigate({ to: '/sign-in', search: { redirect: href } });
+      didRedirectRef.current = true;
+      const target = sanitizeRedirect(hrefRef.current);
+      void navigate({
+        to: '/sign-in',
+        search: target ? { redirect: target } : {},
+      });
     }
-  }, [status, isAuthenticated, href, navigate]);
+  }, [status, isAuthenticated, navigate]);
 
   if (status !== 'ready' || isRouterLoading || !isAuthenticated) {
     return (
