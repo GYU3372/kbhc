@@ -14,7 +14,7 @@ export function Gnb() {
   const { to, label, Icon } = authLink;
 
   return (
-    <header className="border-b border-disabled bg-surface">
+    <header className="border-b border-disabled bg-surface pt-[env(safe-area-inset-top)]">
       <nav
         aria-label="사용자 내비게이션"
         className="flex w-full items-center gap-2 px-5 py-3 md:px-8"

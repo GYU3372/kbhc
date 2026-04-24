@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useDocumentTitle } from '@/shared/lib/use-document-title';
 import { TaskList, TASK_LIST_SCROLL_RESTORATION_ID } from '@/widgets/task-list';
 
 export function TaskListPage() {
+  useDocumentTitle('할 일');
   const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
 
   return (

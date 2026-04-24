@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { FormEvent } from 'react';
 import { HttpError } from '@/shared/api/http';
 import { Button, Input, Modal } from '@/shared/ui';
@@ -15,6 +15,7 @@ export function DeleteTaskModal({ taskId, open, onOpenChange, onDeleted }: Delet
   const [value, setValue] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const mutation = useDeleteTaskMutation();
+  const errorId = useId();
 
   useEffect(() => {
     if (!open) {
@@ -59,19 +60,29 @@ export function DeleteTaskModal({ taskId, open, onOpenChange, onDeleted }: Delet
           <Input
             label="삭제할 할 일 ID"
             hint={`ID: ${taskId}`}
-            error={errorMessage ?? undefined}
             value={value}
             onChange={(event) => setValue(event.target.value)}
             autoComplete="off"
           />
+          {errorMessage ? (
+            <p id={errorId} role="alert" className="text-sm text-danger">
+              {errorMessage}
+            </p>
+          ) : null}
           <Modal.Footer>
             <Modal.Close asChild>
               <Button type="button" variant="ghost">
                 취소
               </Button>
             </Modal.Close>
-            <Button type="submit" variant="danger" disabled={!canSubmit}>
-              {mutation.isPending ? '삭제 중…' : '제출'}
+            <Button
+              type="submit"
+              variant="danger"
+              disabled={!canSubmit}
+              aria-busy={mutation.isPending}
+              aria-describedby={errorMessage ? errorId : undefined}
+            >
+              제출
             </Button>
           </Modal.Footer>
         </form>

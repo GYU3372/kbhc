@@ -18,6 +18,7 @@ const Overlay = forwardRef<ElementRef<typeof Dialog.Overlay>, OverlayProps>(
       ref={ref}
       className={cn(
         'fixed inset-0 z-50 bg-black/40 transition-opacity',
+        'motion-reduce:transition-none',
         'data-[state=closed]:opacity-0',
         className,
       )}
@@ -42,7 +43,9 @@ const Content = forwardRef<ElementRef<typeof Dialog.Content>, ContentProps>(
           'rounded-lg border border-disabled bg-surface p-6 shadow-lg',
           'focus:outline-none',
           'transition-[opacity,transform] duration-150',
+          'motion-reduce:transition-none',
           'data-[state=closed]:opacity-0 data-[state=closed]:scale-95',
+          'motion-reduce:data-[state=closed]:scale-100',
           className,
         )}
         {...props}

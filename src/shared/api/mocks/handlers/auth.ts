@@ -46,6 +46,12 @@ export const authHandlers = [
   http.post<never, never, AuthResponseBody>('/api/refresh', ({ request }) => {
     const verified = verifyRefresh(request);
     if (!verified.ok) {
+      if (verified.reason === 'malformed') {
+        return HttpResponse.json(
+          { errorMessage: 'refresh token 형식이 올바르지 않습니다.' },
+          { status: 400 },
+        );
+      }
       return HttpResponse.json(
         { errorMessage: 'refresh token이 유효하지 않습니다.' },
         { status: 401 },

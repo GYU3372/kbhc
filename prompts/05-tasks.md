@@ -36,6 +36,8 @@
   - `pages/task-list`: 제목 + `TaskList` 위젯 배치.
   - `pages/task-detail`: `useQuery(taskQueries.detail(id))` + `HttpError.status === 404`에서 `EmptyState` + 목록 복귀 버튼, 삭제 버튼 → `DeleteTaskModal` 연결, 성공 시 `/task`로 navigate.
 - Phase 03 `shared/ui`(Button/Card/Modal/Input/Spinner/EmptyState) 재사용만으로 해결, 신규 공통 UI 추가 0건.
+- 추가 보완: `dashboardQueries`를 `entities/dashboard`로 승격하고 task 삭제 성공 시 목록·상세·대시보드 캐시를 함께 정리.
+- 추가 보완: LNB/GNB를 full-width 앱 shell 기준으로 조정하고, task 목록 스크롤 복원·가상 리스트 row 높이 안정화.
 
 ### 검증
 - `pnpm lint`, `pnpm typecheck`, `pnpm build` 모두 통과.
