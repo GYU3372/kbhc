@@ -29,7 +29,7 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
-          className="animate-spin"
+          className="animate-spin motion-reduce:animate-none"
         >
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
           <path

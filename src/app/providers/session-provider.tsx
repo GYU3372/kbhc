@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { refreshSession, resetSession, useSessionStore } from '@/entities/session';
+import { useSessionStore } from '@/entities/session';
+import { refreshSession, resetSession } from '@/features/auth';
 import { configureHttp } from '@/shared/api/http';
 
 type SessionProviderProps = {

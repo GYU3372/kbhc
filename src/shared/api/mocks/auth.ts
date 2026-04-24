@@ -53,6 +53,10 @@ export const issueTokens = (userId: string) => ({
 
 type VerifyResult = { ok: true; userId: string } | { ok: false };
 
+type RefreshResult =
+  | { ok: true; userId: string }
+  | { ok: false; reason: 'missing' | 'expired' | 'malformed' };
+
 export const verifyAccess = (request: Request): VerifyResult => {
   const header = request.headers.get('Authorization');
   if (!header?.startsWith('Bearer ')) return { ok: false };
@@ -61,12 +65,13 @@ export const verifyAccess = (request: Request): VerifyResult => {
   return { ok: true, userId: payload.id };
 };
 
-export const verifyRefresh = (request: Request): VerifyResult => {
+export const verifyRefresh = (request: Request): RefreshResult => {
   const cookie = request.headers.get('Cookie') ?? '';
   const match = /(?:^|;\s*)token=([^;]+)/.exec(cookie);
   const tokenValue = match?.[1] ?? recallRefreshToken();
-  if (!tokenValue) return { ok: false };
+  if (!tokenValue) return { ok: false, reason: 'missing' };
   const payload = parseJwt(tokenValue);
-  if (!isLive(payload)) return { ok: false };
+  if (payload === null) return { ok: false, reason: 'malformed' };
+  if (!isLive(payload)) return { ok: false, reason: 'expired' };
   return { ok: true, userId: payload.id };
 };

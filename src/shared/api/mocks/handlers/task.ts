@@ -20,6 +20,9 @@ const notFound = () =>
     { status: 404 },
   );
 
+const badRequest = (message: string) =>
+  HttpResponse.json<ErrorResponse>({ errorMessage: message }, { status: 400 });
+
 const TASK_EPOCH = Date.UTC(2025, 0, 1);
 const HOUR_MS = 60 * 60_000;
 
@@ -36,10 +39,15 @@ export const taskHandlers = [
 
     const url = new URL(request.url);
     const pageParam = url.searchParams.get('page');
-    const parsed = Number(pageParam ?? '1');
-    const page = Number.isInteger(parsed) && parsed >= 1 ? parsed : 1;
+    if (pageParam === null) {
+      return badRequest('page 파라미터가 필요합니다.');
+    }
+    const parsed = Number(pageParam);
+    if (!Number.isInteger(parsed) || parsed < 1) {
+      return badRequest('page는 1 이상의 정수여야 합니다.');
+    }
 
-    return HttpResponse.json(db.tasks.list(page, PAGE_SIZE));
+    return HttpResponse.json(db.tasks.list(parsed, PAGE_SIZE));
   }),
 
   http.get<TaskIdParams, never, TaskDetailResponse | ErrorResponse>(

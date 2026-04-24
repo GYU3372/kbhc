@@ -5,19 +5,22 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { signIn, useSessionStore } from '@/entities/session';
+import { useSessionStore } from '@/entities/session';
+import { signIn } from '@/features/auth';
 import { HttpError } from '@/shared/api/http';
 import { useDocumentTitle } from '@/shared/lib/use-document-title';
 import { Button, Input, Modal } from '@/shared/ui';
 
 const routeApi = getRouteApi('/sign-in');
 
-const schema = z.object({
-  email: z.string().email('이메일 형식이 올바르지 않습니다.'),
-  password: z
-    .string()
-    .regex(/^[A-Za-z0-9]{8,24}$/, '영문·숫자 8–24자로 입력해주세요.'),
-});
+const schema = z
+  .object({
+    email: z.string().email('이메일 형식이 올바르지 않습니다.'),
+    password: z
+      .string()
+      .regex(/^[A-Za-z0-9]{8,24}$/, '영문·숫자 8–24자로 입력해주세요.'),
+  })
+  .strict();
 
 type SignInForm = z.infer<typeof schema>;
 

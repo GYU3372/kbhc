@@ -95,7 +95,7 @@ export function TaskList({ scrollElement }: TaskListProps) {
 
   if (isError) {
     return (
-      <p role="alert" className="p-4 text-sm text-danger">
+      <p role="status" className="p-4 text-sm text-danger">
         할 일 목록을 불러오지 못했습니다.
       </p>
     );
@@ -114,6 +114,8 @@ export function TaskList({ scrollElement }: TaskListProps) {
       style={{ height: `${virtualizer.getTotalSize()}px` }}
     >
       <div
+        role="list"
+        aria-label="할 일 목록"
         className="absolute inset-x-0 top-0"
         style={{ height: `${virtualizer.getTotalSize()}px` }}
       >
@@ -124,6 +126,9 @@ export function TaskList({ scrollElement }: TaskListProps) {
             <div
               key={virtualRow.key}
               data-index={virtualRow.index}
+              role={isSentinel ? 'presentation' : 'listitem'}
+              aria-setsize={isSentinel ? undefined : items.length}
+              aria-posinset={isSentinel ? undefined : virtualRow.index + 1}
               className="absolute left-0 top-0 box-border w-full px-1 py-1.5"
               style={{
                 height: `${virtualRow.size}px`,

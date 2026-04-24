@@ -22,7 +22,7 @@ export function DashboardPage() {
           <Spinner label="대시보드 불러오는 중" />
         </div>
       ) : isError || !data ? (
-        <p role="alert" className="text-sm text-danger">
+        <p role="status" className="text-sm text-danger">
           대시보드를 불러오지 못했습니다.
         </p>
       ) : (

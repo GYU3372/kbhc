@@ -63,7 +63,7 @@ export function TaskDetailPage({ id }: TaskDetailPageProps) {
   if (isError || !data) {
     return (
       <main className="mx-auto w-full max-w-5xl p-4">
-        <p role="alert" className="text-sm text-danger">
+        <p role="status" className="text-sm text-danger">
           상세 정보를 불러오지 못했습니다.
         </p>
       </main>

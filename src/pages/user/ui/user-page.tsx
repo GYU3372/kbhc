@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { ExitIcon } from '@radix-ui/react-icons';
 
-import { useSignOut } from '@/entities/session';
+import { useSignOut } from '@/features/auth';
 import { userQueries } from '@/entities/user';
 import { useDocumentTitle } from '@/shared/lib/use-document-title';
 import { Button, Card, EmptyState, Spinner } from '@/shared/ui';

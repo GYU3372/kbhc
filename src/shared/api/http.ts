@@ -71,7 +71,6 @@ function buildInit(method: string, options: RequestOptions, token: string | null
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
-    credentials: 'include',
   };
   if (body !== undefined) {
     init.body = JSON.stringify(body);
