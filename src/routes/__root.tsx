@@ -1,8 +1,10 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router';
+import { NotFoundPage } from '@/pages/not-found';
 import { Gnb } from '@/widgets/gnb';
 
 export const Route = createRootRoute({
   component: RootLayout,
+  notFoundComponent: NotFoundPage,
 });
 
 function RootLayout() {
