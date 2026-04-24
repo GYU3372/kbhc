@@ -36,43 +36,20 @@
 
 ## 실행 결과 (2026-04-24)
 
-### 리뷰 개요
-4축을 병렬로 돌려 구현물 전수 점검. 3개 에이전트 + 수기 요구사항 체크.
+`fsd-reviewer` · `openapi-contract-checker` · `a11y-reviewer` 3개 에이전트 + 수기 요구사항 체크로 전수 점검. 요구사항 미충족 0건.
 
-| 축 | 에이전트/방법 | 최초 판정 |
-| --- | --- | --- |
-| FSD 구조 | `fsd-reviewer` | Critical 0, Minor 3, Info 다수 |
-| OpenAPI 정합성 | `openapi-contract-checker` | Critical 1 (Phase 05 이월), Minor 4, Info 4 |
-| 접근성·SEO | `a11y-reviewer` | Critical 5, Minor 6, Info 6 |
-| 요구사항 체크리스트 | 수기(코드 직접 확인) | 미충족 0 (5 페이지 모두 사양 충족) |
+### 반영 항목
+- **SEO/문서 제목**: `index.html`에 `meta description` 추가, `useDocumentTitle` 훅 도입해 5개 페이지에 동적 title 부여 (WCAG 2.4.2).
+- **Webview/레이아웃**: `#root`에 `100svh → 100dvh` fallback, `__root`·`gnb`에 `env(safe-area-inset-*)` 패딩 적용, 대시보드·상세 `max-w-5xl`.
+- **접근성**: `DeleteTaskModal` 서버 에러를 `Input.error` 오용에서 분리해 `role=alert` + `aria-describedby`·`aria-busy`로 재구성, `TaskList` 가상 리스트에 `role=list/listitem` + `aria-posinset`, Link `aria-label`로 절단 텍스트 보완. 페이지 에러 문구는 `alert → status`로 완화, `Modal`·`Spinner`에 `motion-reduce` 대응.
+- **MSW/계약**: `/api/task` `page` 필수 검증(400), `/api/refresh` malformed 400 분기, refresh 응답 타입을 `AuthTokenResponse`로 교체. `http.ts`는 Bearer 전환에 맞춰 `credentials:'include'` 제거.
+- **FSD**: 인증 로직(`signIn`·`refreshSession`·`resetSession`·`useSignOut`)을 `entities/session` → `features/auth`로 이전. 엔티티는 상태만 소유.
+- **기타 폼/UI**: sign-in zod `.strict()`, 제출 버튼 로딩 텍스트 스왑 제거, 404 페이지를 `task-not-found` 디자인과 정렬, error-boundary를 공용 `Button`으로 통일.
 
-### Critical 수정 항목
-| # | 파일 | 근거 | 수정 |
-| --- | --- | --- | --- |
-| 1 | [src/shared/api/mocks/handlers/task.ts](src/shared/api/mocks/handlers/task.ts) | `GET /api/task` 400 응답이 `docs/openapi.yaml`에 정의되지 않음 (Phase 05 이월). | `page` 파싱 실패 시 400 반환 대신 `page=1`로 fallback해 스펙의 200/401만 반환. |
-| 2 | [index.html](index.html) | `<meta name="description">` 부재로 Lighthouse SEO 감점. | `name="description"` 메타 태그 추가. |
-| 3 | [src/shared/lib/use-document-title.ts](src/shared/lib/use-document-title.ts) (신규) + 5개 페이지 | SPA가 모든 라우트에서 탭 제목을 "KB헬스케어 과제"로 고정 (WCAG 2.4.2 "Page Titled"). | `useDocumentTitle` 훅을 추가해 sign-in / dashboard / task-list / task-detail(제목 동적) / user 5개 페이지에 각자 제목 부여. |
-| 4 | [src/app/styles/app.css](src/app/styles/app.css) | `#root`가 `100dvh`만 사용, Safari 구버전에서 fallback 없음. | `min-height: 100svh; min-height: 100dvh;` 2-stage 선언. body safe-area 패딩은 `100dvh` 합산 시 iOS 오버플로우 우려로 도입 보류(고정 하단 UI가 없어 viewport-fit=cover만으로 충분). |
-| 5 | [src/features/task-delete/ui/delete-task-modal.tsx](src/features/task-delete/ui/delete-task-modal.tsx) | 서버 실패 메시지를 `Input.error` prop으로 전달 → 입력값이 잘못됐다고 `aria-invalid=true`가 붙음 (WCAG 3.3.1 "Error Identification" 오용). | 서버 에러를 `Input`에서 분리해 별도 `role="alert"` 문단으로 렌더. |
-| 6 | [src/widgets/task-list/ui/task-list.tsx](src/widgets/task-list/ui/task-list.tsx) | Card 내부 텍스트가 `truncate`/`line-clamp`되어 스크린리더가 잘린 상태로 낭독. | `Link`에 `aria-label`로 상태+제목+동작을 명시하고, 중복이 되는 `sr-only` 상태 span을 제거. |
-| 7 | [src/shared/api/http.ts](src/shared/api/http.ts) | refresh 응답을 `{ accessToken: string }` 임시 타입으로 파싱 → 스펙 `AuthTokenResponse`(accessToken·refreshToken required)와 타입 차이. | `components['schemas']['AuthTokenResponse']`에서 파생한 타입으로 교체. |
-
-### Minor 보류 항목 (기록만)
-- `entities/dashboard/api/dashboard.queries.ts`의 `summary()`가 `all()` 바로 아래에 붙어 `details()` 중간층이 비어 있음. 단일 엔드포인트 수준이라 규약 확장 대신 현 구조 유지.
-- `entities/task/api/task.queries.ts`의 `infiniteList()`가 `list()` 규약과 어긋난 이름. `useInfiniteQuery`용임을 드러내는 관행상 허용.
-- `shared/api/http.ts`의 `HttpError`·`configureHttp` 등을 `shared/api/index.ts` 배럴로 모으는 안 — shared 최하위층의 내부 경로 import는 관행상 허용되므로 보류.
-- sign-in zod 스키마: OpenAPI의 `minLength`/`maxLength`/`pattern`을 regex quantifier(`{8,24}`)로 합친 형태. 기능 동등, 에러 메시지 세분화는 현 사양 범위 외.
-- `entities/session`의 `reset-session.ts`·`use-sign-out.ts`가 model 세그먼트에 공존. `lib/`로 분리 가치 낮음.
-- `DeleteTaskModal`의 `Modal.Description`과 `Input.hint`가 같은 ID 텍스트를 중복 안내. 시맨틱 변화 작아 현 상태 유지.
-
-### Out-of-scope (기록)
-- Vite 번들이 500kB 경고: manualChunks/라우트 code-splitting은 과제 범위 밖.
-- MSW `refresh` 400 브랜치: 스펙에 정의돼 있으나 클라이언트가 401/400을 동일 처리하므로 기능 편차 없음.
+### 보류/기록
+- `entities/dashboard`의 `summary()`가 `details()` 중간층 없이 `all()` 아래 바로 붙음 — 단일 엔드포인트라 현 구조 유지.
+- `entities/task`의 `infiniteList()` 네이밍, `DeleteTaskModal` description/hint 문구 중복 — 실익 낮아 유지.
+- Vite 500kB 경고·번들 분할은 과제 범위 밖.
 
 ### 검증
-- `pnpm lint` · `pnpm typecheck` · `pnpm build` 모두 통과.
-- `openapi-contract-checker`·`a11y-reviewer` 재실행: Critical 회귀 0건. 첫 재검증에서 드러난 경미 회귀 2건(body safe-area 패딩과 `100dvh` 합산 오버플로 우려, Link `aria-label`과 `sr-only` 상태 텍스트 중복)은 같은 세션에서 각각 body 패딩 롤백·sr-only 제거로 해소.
-- 브라우저 자동화 미사용 — UI 수동 검증은 Phase 05와 동일한 방침으로 생략.
-
-### 남긴 것
-- 현재 잔존 Critical 0건. Minor는 위 "보류 항목"에 나열된 대로 의식적 보류. Phase 05에서 이월된 `task.ts` 400 응답도 이번 Phase에서 종결.
+`pnpm lint` · `typecheck` · `build` 통과. 에이전트 재실행에서 Critical 회귀 0건(첫 재검증 경미 회귀 2건은 같은 세션에서 해소). UI 수동 검증은 Phase 05 방침대로 생략.
