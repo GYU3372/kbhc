@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardQueries } from '@/entities/dashboard';
+import { useDocumentTitle } from '@/shared/lib/use-document-title';
 import { Card, Spinner } from '@/shared/ui';
 
 const METRIC_LABEL = {
@@ -9,6 +10,7 @@ const METRIC_LABEL = {
 } as const;
 
 export function DashboardPage() {
+  useDocumentTitle('대시보드');
   const { data, isLoading, isError } = useQuery(dashboardQueries.summary());
 
   return (

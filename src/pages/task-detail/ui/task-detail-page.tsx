@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { taskQueries } from '@/entities/task';
 import { DeleteTaskModal } from '@/features/task-delete';
 import { HttpError } from '@/shared/api/http';
+import { useDocumentTitle } from '@/shared/lib/use-document-title';
 import { Button, EmptyState, Spinner } from '@/shared/ui';
 
 type TaskDetailPageProps = {
@@ -34,6 +35,8 @@ export function TaskDetailPage({ id }: TaskDetailPageProps) {
       return failureCount < 3;
     },
   });
+
+  useDocumentTitle(data?.title ?? '할 일 상세');
 
   if (isLoading) {
     return (

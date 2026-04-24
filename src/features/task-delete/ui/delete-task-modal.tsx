@@ -59,11 +59,15 @@ export function DeleteTaskModal({ taskId, open, onOpenChange, onDeleted }: Delet
           <Input
             label="삭제할 할 일 ID"
             hint={`ID: ${taskId}`}
-            error={errorMessage ?? undefined}
             value={value}
             onChange={(event) => setValue(event.target.value)}
             autoComplete="off"
           />
+          {errorMessage ? (
+            <p role="alert" className="text-sm text-danger">
+              {errorMessage}
+            </p>
+          ) : null}
           <Modal.Footer>
             <Modal.Close asChild>
               <Button type="button" variant="ghost">

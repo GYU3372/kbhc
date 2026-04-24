@@ -1,4 +1,7 @@
 import { env } from '@/shared/config/env';
+import type { components } from '@/shared/api/openapi';
+
+type AuthTokenResponse = components['schemas']['AuthTokenResponse'];
 
 export class HttpError extends Error {
   constructor(
@@ -45,7 +48,7 @@ async function runRefresh(): Promise<string | null> {
     headers: { 'Content-Type': 'application/json' },
   });
   if (!response.ok) return null;
-  const tokens = (await response.json()) as { accessToken: string } | null;
+  const tokens = (await response.json()) as AuthTokenResponse | null;
   return tokens?.accessToken ?? null;
 }
 

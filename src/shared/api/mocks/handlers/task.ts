@@ -36,13 +36,8 @@ export const taskHandlers = [
 
     const url = new URL(request.url);
     const pageParam = url.searchParams.get('page');
-    const page = Number(pageParam ?? '1');
-    if (!Number.isInteger(page) || page < 1) {
-      return HttpResponse.json(
-        { errorMessage: 'page 파라미터가 올바르지 않습니다.' },
-        { status: 400 },
-      );
-    }
+    const parsed = Number(pageParam ?? '1');
+    const page = Number.isInteger(parsed) && parsed >= 1 ? parsed : 1;
 
     return HttpResponse.json(db.tasks.list(page, PAGE_SIZE));
   }),

@@ -4,9 +4,11 @@ import { ExitIcon } from '@radix-ui/react-icons';
 
 import { useSignOut } from '@/entities/session';
 import { userQueries } from '@/entities/user';
+import { useDocumentTitle } from '@/shared/lib/use-document-title';
 import { Button, Card, EmptyState, Spinner } from '@/shared/ui';
 
 export function UserPage() {
+  useDocumentTitle('회원정보');
   const navigate = useNavigate();
   const signOut = useSignOut();
   const query = useQuery(userQueries.me());

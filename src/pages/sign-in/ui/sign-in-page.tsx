@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { signIn, useSessionStore } from '@/entities/session';
 import { HttpError } from '@/shared/api/http';
+import { useDocumentTitle } from '@/shared/lib/use-document-title';
 import { Button, Input, Modal } from '@/shared/ui';
 
 const routeApi = getRouteApi('/sign-in');
@@ -21,6 +22,7 @@ const schema = z.object({
 type SignInForm = z.infer<typeof schema>;
 
 export function SignInPage() {
+  useDocumentTitle('로그인');
   const navigate = useNavigate();
   const { redirect: redirectTo } = routeApi.useSearch();
   const setAccessToken = useSessionStore((state) => state.setAccessToken);
