@@ -79,7 +79,7 @@ export function SignInPage() {
           {...register('password')}
         />
         <Button type="submit" disabled={submitDisabled}>
-          {mutation.isPending ? '로그인 중…' : '로그인'}
+          로그인
         </Button>
       </form>
 

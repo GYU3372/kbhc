@@ -75,7 +75,7 @@ export function DeleteTaskModal({ taskId, open, onOpenChange, onDeleted }: Delet
               </Button>
             </Modal.Close>
             <Button type="submit" variant="danger" disabled={!canSubmit}>
-              {mutation.isPending ? '삭제 중…' : '제출'}
+              제출
             </Button>
           </Modal.Footer>
         </form>
